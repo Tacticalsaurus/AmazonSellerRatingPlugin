@@ -1,0 +1,77 @@
+{
+    "manifest_version": 3,
+    "name": "Amazon Seller Rating",
+    "version": "0.1",
+    "description": "Shows amazon seller rating underneath the product rating",
+
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.amazon.com/*",
+                "https://www.amazon.ca/*",
+                "https://www.amazon.com.mx/*",
+                "https://www.amazon.co.uk/*",
+                "https://www.amazon.de/*",
+                "https://www.amazon.fr/*",
+                "https://www.amazon.it/*",
+                "https://www.amazon.es/*",
+                "https://www.amazon.co.jp/*",
+                "https://www.amazon.sg/*",
+                "https://www.amazon.ae/*",
+                "https://www.amazon.com.br/*",
+                "https://www.amazon.in/*",
+                "https://www.amazon.nl/*",
+                "https://www.amazon.sa/*",
+                "https://www.amazon.com.tr/*",
+                "https://www.amazon.se/*",
+                "https://www.amazon.pl/*",
+                "https://www.amazon.com.be/*",
+                "https://www.amazon.com.au/*",
+                "https://www.amazon.cn/*"
+            ],
+            "js": [
+                "ratingDetailsPopup.js",
+                "sellerRating.js"                
+            ]
+        }
+    ],
+
+    
+    "web_accessible_resources": [
+        {
+           "resources" : 
+           [
+            "32_grey.png",
+            "32_greyOutline.png",
+            "html/templateMerchantRatingFail.html",
+            "html/templateMerchantRating.html",
+            "html/templateMerchantRatingDetailsPopup.html"
+            ],
+            "matches": [
+                "https://www.amazon.com/*",
+                "https://www.amazon.ca/*",
+                "https://www.amazon.com.mx/*",
+                "https://www.amazon.co.uk/*",
+                "https://www.amazon.de/*",
+                "https://www.amazon.fr/*",
+                "https://www.amazon.it/*",
+                "https://www.amazon.es/*",
+                "https://www.amazon.co.jp/*",
+                "https://www.amazon.sg/*",
+                "https://www.amazon.ae/*",
+                "https://www.amazon.com.br/*",
+                "https://www.amazon.in/*",
+                "https://www.amazon.nl/*",
+                "https://www.amazon.sa/*",
+                "https://www.amazon.com.tr/*",
+                "https://www.amazon.se/*",
+                "https://www.amazon.pl/*",
+                "https://www.amazon.com.be/*",
+                "https://www.amazon.com.au/*",
+                "https://www.amazon.cn/*"
+            ]
+        }
+        
+    ]
+
+}

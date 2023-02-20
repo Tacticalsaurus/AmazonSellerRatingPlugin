@@ -1,0 +1,61 @@
+/*#merchantRatingPopup div table tbody tr {
+   
+}*/
+
+#merchantRatingPopup div table tbody tr td {
+    height: 20px;
+    padding: 0;
+}
+
+#merchantRatingPopup a, a:link, a:visited {
+    text-decoration: none;
+    color: #007185;
+}
+
+#merchantRatingPopup .pointingArrowBorder {
+    position: absolute;
+    margin-left: -14px;    
+    top: -18px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-bottom-color: #BBBFBF;
+    z-index: 300;
+}
+
+#merchantRatingPopup .pointingArrow {
+    position: absolute;
+    top: -5px;
+    margin-left: -8px;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-bottom-color: #fff;
+    z-index: 300;
+}
+
+#merchantRatingPopup div table tbody tr td:nth-of-type(1) {
+    width: 15%;
+    padding: 5px 3% 5px 0;
+}
+
+#merchantRatingPopup div table tbody tr td:nth-of-type(2) {
+    height: 20px;
+    width: 73%;
+}
+
+#merchantRatingPopup div table tbody tr td:nth-of-type(2) div {
+    height: 20px;
+    width: 100%;
+    box-shadow: inset 0 0 0 1px #BBBFBF;
+    line-height: 0px;
+    background-color: #F0F2F2;
+    border-radius: 4px;
+}
+
+#merchantRatingPopup div table tbody tr td:nth-of-type(3) {
+    width: 12%;
+    padding: 5px 0 5px 3%;
+}
+
