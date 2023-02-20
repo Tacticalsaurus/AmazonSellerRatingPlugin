@@ -172,18 +172,40 @@ if(sellerInfo != null) {
                                 merchantRatingPopup.style.top = rect.bottom + "px";
                             };
 
+                            timeoutIDHidePopupOpacity = 0;
+                            timeoutIDHidePopupVisibility = 0;
+
                             let funcShowPopup = function() {
-                                merchantRatingPopup.style.display = "block";
-                                funcSetPopupPositon();                                
+                                clearTimeout(timeoutIDHidePopupOpacity);
+                                clearTimeout(timeoutIDHidePopupVisibility);
+                                merchantRatingPopup.style.opacity = 1;
+                                //merchantRatingPopup.style.display = "block";
+                                merchantRatingPopup.style.visibility = "visible"
+                                funcSetPopupPositon();
                             }
                             
                             window.onresize = funcSetPopupPositon;
 
                             ratingStarsElement.onmouseover = funcShowPopup;
+                            merchantRatingPopup.onmouseover = funcShowPopup;
+                            
 
-                            ratingStarsElement.onmouseleave = function() {
-                                merchantRatingPopup.style.display = "none";
+                            funcHidePopup = function() {
+                                clearTimeout(timeoutIDHidePopupOpacity);
+                                clearTimeout(timeoutIDHidePopupVisibility);
+
+                                timeoutIDHidePopupOpacity = setTimeout(() => {
+                                    //merchantRatingPopup.style.display = "none";                                    
+                                    merchantRatingPopup.style.opacity = 0;
+                                }, 1000);
+                                timeoutIDHidePopupVisibility = setTimeout(() => {
+                                    merchantRatingPopup.style.visibility = "hidden";
+                                    merchantRatingPopup.style.top = "-1000px";
+                                }, 1250);                                
                             };
+
+                            ratingStarsElement.onmouseleave = funcHidePopup;
+                            merchantRatingPopup.onmouseleave = funcHidePopup;
 
                             
                                                 

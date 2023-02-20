@@ -1,5 +1,6 @@
-<div id="merchantRatingPopup" style="margin: 6px; width: 366px; height: auto; z-index: 299; position: absolute; opacity: 1; display: none; background-color: white;
-    left: 1000px; top: 1000px; border: 2px solid #BBBFBF; border-color: #BBBFBF; border-radius: 8px; box-shadow: 0 2px 5px rgba(15,17,17,.15)">
+<div id="merchantRatingPopup" style="margin: 6px; width: 366px; height: auto; z-index: 299; position: absolute; opacity: 0; visibility: hidden; background-color: white;
+    left: 1000px; top: -1000px; border: 2px solid #BBBFBF; border-color: #BBBFBF; border-radius: 8px; box-shadow: 0 2px 5px rgba(15,17,17,.15);
+    transition: opacity 250ms">
     <div class="pointingArrowBorder">
         <div class="pointingArrow"></div>
     </div>
@@ -8,7 +9,7 @@
             <a href="_placeHolderSellerLink_">_placeHolderSellerName_</a>
         </div>
         <span style="display: block; margin: 5px 0 5px 0;">_placeHolderStars_ <span style="font-size: 16px; margin-left: 3px;"><b>_placeHolderNumericalRating_ out of 5</b></span></span>        
-        <span style="display:block; margin: 5px 0 10px 0"><b>_placeHolderRatingCount_ lifetime reviews</b></span>
+        <span style="display:block; margin: 5px 0 10px 0; color:#565959">_placeHolderRatingCount_ lifetime reviews</span>
         <table width="100%" id="merchant-info">
             <tbody>
                 <tr style="height: 20px">
