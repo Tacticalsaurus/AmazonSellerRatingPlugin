@@ -1,11 +1,15 @@
 document.body.style.border = "5px solid red" 
 
-let idMerchant = "merchant-info"
-let sellerInfo = document.getElementById(idMerchant)
+
+let sellerInfo = document.getElementById("fresh-merchant-info")
+if(sellerInfo === null) {
+    sellerInfo = document.getElementById("merchant-info")
+}
  
 
 if(sellerInfo != null) {
 
+    //let anchors = sellerInfo.getElementsByTagName("a");
     let links = sellerInfo.getElementsByClassName("a-link-normal")
 
     let merchantLinkRelative = null
@@ -17,6 +21,7 @@ if(sellerInfo != null) {
                 value = href.value
                 if(value.includes("marketplaceID=")) {
                     merchantLinkRelative = value
+                    break;
                 }
             }    
         }
@@ -51,8 +56,6 @@ if(sellerInfo != null) {
             console.log(this.responseXML)
             let divMerchantRating = this.responseXML.getElementById("seller-feedback-summary-rd");
             let ratingFull = null;
-            let ratingStars = null;
-            let ratingPercentageText = null;
             let countRatings = 0;
             let starCountHtml = null;
             
@@ -60,15 +63,13 @@ if(sellerInfo != null) {
                 ratingFull = divMerchantRating.getElementsByClassName("feedback-detail-description");                
 
                 if(ratingFull!=null && ratingFull.length > 0) {
-                    ratingStars = ratingFull[0].getElementsByClassName("feedback-detail-stars");
-                    ratingPercentageText = ratingFull[0].text.replace(ratingStars[0].innerText, "");                    
-                    
-                    ratings = this.responseXML.querySelector(`[data-a-state='{"key":"lifetimeRatingsData"}']`)
-                    ratingsObject = JSON.parse(ratings.innerHTML);
+                   
+                    let ratings = this.responseXML.querySelector(`[data-a-state='{"key":"twelveMonthRatingsData"}']`)
+                    let ratingsObject = JSON.parse(ratings.innerHTML);
 
                     countRatings = ratingsObject.ratingCount;//parseInt(ratingPercentageText.split("(")[1].split(" ")[0]);
 
-                    starCountHtml = this.responseXML.getElementById("effective-timeperiod-rating-lifetime-description");
+                    starCountHtml = this.responseXML.getElementById("effective-timeperiod-rating-year-description");
                 }
             }
             
@@ -175,6 +176,7 @@ if(sellerInfo != null) {
                             timeoutIDHidePopupOpacity = 0;
                             timeoutIDHidePopupVisibility = 0;
 
+                            
                             let funcShowPopup = function() {
                                 clearTimeout(timeoutIDHidePopupOpacity);
                                 clearTimeout(timeoutIDHidePopupVisibility);
@@ -197,11 +199,11 @@ if(sellerInfo != null) {
                                 timeoutIDHidePopupOpacity = setTimeout(() => {
                                     //merchantRatingPopup.style.display = "none";                                    
                                     merchantRatingPopup.style.opacity = 0;
-                                }, 1000);
+                                }, 250);
                                 timeoutIDHidePopupVisibility = setTimeout(() => {
                                     merchantRatingPopup.style.visibility = "hidden";
                                     merchantRatingPopup.style.top = "-1000px";
-                                }, 1250);                                
+                                }, 500);                                
                             };
 
                             ratingStarsElement.onmouseleave = funcHidePopup;
