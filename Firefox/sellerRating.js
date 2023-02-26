@@ -1,20 +1,46 @@
 document.body.style.border = "5px solid red" 
 
+let sellerInfos = document.querySelectorAll("[id='freshShipsFromSoldBy_feature_div']"); //pages on fresh items have this id. But only one of the divs with this id points to the merchant page
+let sellerInfo = null;
 
-let sellerInfo = document.getElementById("fresh-merchant-info")
+for(info of sellerInfos){
+    anchors = info.getElementsByTagName("a");
+    if(anchors === null || anchors.length === 0) { //this div does not point to the merchant page
+        continue; //try the next div
+    }
+    sellerInfo = info;
+    break;
+}
+
+/*if(sellerInfo === null ) {
+    sellerInfo = document.getElementById("fresh-merchant-info")    
+}*/
+ 
 if(sellerInfo === null) {
     sellerInfo = document.getElementById("merchant-info")
 }
- 
 
 if(sellerInfo != null) {
 
-    //let anchors = sellerInfo.getElementsByTagName("a");
-    let links = sellerInfo.getElementsByClassName("a-link-normal")
+    let anchors = sellerInfo.getElementsByTagName("a");
+    let links = sellerInfo.getElementsByClassName("a-link-normal")    
 
     let merchantLinkRelative = null
 
-    if(links != null && links.length > 0) {
+    if(anchors!==null && anchors.length > 0) {
+        for(element of anchors) {
+            let href = element.attributes["href"]
+            if(href!=null) {
+                value = href.value
+                if(value.includes("marketplaceID=")) {
+                    merchantLinkRelative = value
+                    break;
+                }
+            }    
+        }
+    }
+
+    /*if(links !== null && links.length > 0) {
         for(element of links) {
             let href = element.attributes["href"]
             if(href!=null) {
@@ -37,7 +63,7 @@ if(sellerInfo != null) {
             }
         }
 
-    }
+    }*/
     
 
     if(merchantLinkRelative!=null) {
@@ -54,26 +80,20 @@ if(sellerInfo != null) {
 
         xhr.onload = function () {
             console.log(this.responseXML)
-            let divMerchantRating = this.responseXML.getElementById("seller-feedback-summary-rd");
-            let ratingFull = null;
+            
             let countRatings = 0;
             let starCountHtml = null;
+                
+            let ratings = this.responseXML.querySelector(`[data-a-state='{"key":"twelveMonthRatingsData"}']`)
+            let ratingsObject = JSON.parse(ratings.innerHTML);
+
+            countRatings = ratingsObject.ratingCount;//parseInt(ratingPercentageText.split("(")[1].split(" ")[0]);
+
+            starCountHtml = this.responseXML.getElementById("effective-timeperiod-rating-year-description");
+        
             
-            if(divMerchantRating != null) {
-                ratingFull = divMerchantRating.getElementsByClassName("feedback-detail-description");                
-
-                if(ratingFull!=null && ratingFull.length > 0) {
-                   
-                    let ratings = this.responseXML.querySelector(`[data-a-state='{"key":"twelveMonthRatingsData"}']`)
-                    let ratingsObject = JSON.parse(ratings.innerHTML);
-
-                    countRatings = ratingsObject.ratingCount;//parseInt(ratingPercentageText.split("(")[1].split(" ")[0]);
-
-                    starCountHtml = this.responseXML.getElementById("effective-timeperiod-rating-year-description");
-                }
-            }
             
-            let sellerName = this.responseXML.getElementById("sellerName-rd").innerText;            
+            let sellerName = this.responseXML.getElementById("seller-name").innerText;
             
             let divPrevious = document.getElementById("zeitgeistBadge_feature_div"); //best selling rank
             if(divPrevious == null) {
@@ -124,7 +144,7 @@ if(sellerInfo != null) {
             link.href = browser.runtime.getURL("html/main.css")+"?version=" + Date.now();
             shadowDom.appendChild(link);
 
-            if(divMerchantRating!=null && sellerName!=null) {
+            if(sellerName!=null) {
 
                 fetch(browser.runtime.getURL('html/templateMerchantRating.html'))
                 .then(r => r.text())
