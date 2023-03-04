@@ -156,12 +156,43 @@ if(sellerInfo != null) {
                     .replace("_placeHolderSellerLink_", merchantLinkFull)
                     .replace("_placeHolderSellerName_", sellerName);
                     
+
                     createRatingPopupHTML(this.responseXML, starHtmlFull, starCount, ratingsFormatted
                         , sellerName, merchantLinkFull)                 
                     .then(html2 => { 
                         
                         shadowDom.innerHTML += htmlUpdated + html2;
-                                                
+                          
+                        let iconPopovers = document.querySelectorAll(".a-icon.a-icon-popover");
+                        
+                        let style = null;
+                        for(icon of iconPopovers) {
+                            let defaultView = (icon.ownerDocument || document).defaultView;
+                            style = defaultView.getComputedStyle(icon, null); //get a reference to to the computed style of the popover icon
+                            let w = style.getPropertyValue("width")
+                            w = w.replace("px", "");
+                            w = parseInt(w);
+
+                            if(!isNaN(w) && w > 0) { //there are iconpopovers with width 0. We only want the ones with width > 0                                
+                                break;
+                            }
+                        }
+                        
+
+                        if (style.cssText !== '') {
+                            shadowDom.getElementById("a-icon-popover").style.cssText = style.cssText; //paste the styles into the icon element
+                        } else {
+                            const cssText = Object.values(style).reduce(
+                                (css, propertyName) =>
+                                    `${css}${propertyName}:${style.getPropertyValue(
+                                        propertyName
+                                    )};`
+                            );
+                        
+                            shadowDom.getElementById("a-icon-popover").style.cssText = cssText //paste the styles into the icon element
+                        }
+
+                        
                                 
                         setTimeout(() => {
 
