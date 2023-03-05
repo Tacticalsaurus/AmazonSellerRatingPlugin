@@ -1,5 +1,31 @@
 document.body.style.border = "5px solid red" 
 
+let tempData = {
+    sellerID: "A1V6B6X13IP7WI",
+    sellerName: "Amazon.com Services LLC",
+    rating: 4.5,
+    ratingCount: 1000,
+    
+    ratingCount1Stars: 30,
+    ratingCount2Stars: 30,
+    ratingCount3Stars: 30,
+    ratingCount4Stars: 30,
+    ratingCount5stars: 30,
+
+    lastUpdated: new Date()
+}
+
+initDatabase(()=> {
+    cacheData(tempData, (event) => {
+        console.log("data cached");
+        getData("A1V6B6X13IP7WI", (event, data) => {
+            console.log(data.sellerName);
+        });
+    });
+});
+
+
+
 let sellerInfos = document.querySelectorAll("[id='freshShipsFromSoldBy_feature_div']"); //pages on fresh items have this id. But only one of the divs with this id points to the merchant page
 let sellerInfo = null;
 
