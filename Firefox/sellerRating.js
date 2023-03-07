@@ -1,28 +1,42 @@
 document.body.style.border = "5px solid red" 
 
 let tempData = {
-    sellerID: "A1V6B6X13IP7WI",
+    sellerID: "A1V6B6X13IP732",
     sellerName: "Amazon.com Services LLC",
     rating: 4.5,
-    ratingCount: 1000,
-    
-    ratingCount1Stars: 30,
+    ratingCount: 1000,    
+    ratingCount1Stars: 31,
     ratingCount2Stars: 30,
     ratingCount3Stars: 30,
     ratingCount4Stars: 30,
     ratingCount5stars: 30,
-
     lastUpdated: new Date()
 }
+//tempData = { sellerID: "A1V6B6X13IP445", rating: 4.5, ratingCount: 1000 };
 
-initDatabase(()=> {
-    cacheData(tempData, (event) => {
-        console.log("data cached");
-        getData("A1V6B6X13IP7WI", (event, data) => {
-            console.log(data.sellerName);
-        });
-    });
+let database = null;
+let db = null;
+initDatabase((db)=> {
+    database = db;
 });
+
+setTimeout(() => {
+    /*cacheData(database, tempData, (event) => {
+        console.log("data cached");
+        
+    });*/
+
+    /*getData(database, "A1V6B6X13IP732", (event, data) => {
+        console.log(data.sellerName);
+        data.ratingCount = 2222;
+        
+    });*/
+
+    updateData(database, "A1V6B6X13IP732", (data)=>{
+        data.ratingCount = 2222;
+    });
+}, 3000);
+
 
 
 
