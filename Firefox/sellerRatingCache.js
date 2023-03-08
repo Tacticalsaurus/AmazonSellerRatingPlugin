@@ -2,71 +2,71 @@
 const DBName = "AmazonSellerRatingPluginData";
 const DBVersion = 4;
 const ObjectStoreName = "SellerRating";
+let db = null;
 
-function initDatabase(callbackOnSuccess) {
-    const request = indexedDB.open(DBName, DBVersion);
+
+
+const request = indexedDB.open(DBName, DBVersion);
+
+console.log("Opening database" + request);
+request.onerror = (event) => {
+    console.log("Error opening database>>" + event.target.error);
+    //event.target.result.close();
+}
+
+request.onupgradeneeded = (event) => {
     
-    console.log("Opening database" + request);
-    request.onerror = (event) => {
-        console.log("Error opening database>>" + event.target.error);
-        //event.target.result.close();
+    console.log("Upgrading database");
+    const db = event.target.result;
+
+    if(db.objectStoreNames.contains(ObjectStoreName)) {
+        db.deleteObjectStore(ObjectStoreName);
     }
 
-    request.onupgradeneeded = (event) => {
+    const objectStore = db.createObjectStore(ObjectStoreName, { keyPath: "sellerID" });
+
+
+    objectStore.transaction.oncomplete = (event) => {
+        console.log("Database setup complete");
         
-        console.log("Upgrading database");
-        const db = event.target.result;
-
-        if(db.objectStoreNames.contains(ObjectStoreName)) {
-            db.deleteObjectStore(ObjectStoreName);
-        }
-
-        const objectStore = db.createObjectStore(ObjectStoreName, { keyPath: "sellerID" });
-
-
-        objectStore.transaction.oncomplete = (event) => {
-            console.log("Database setup complete");
-            /*sellerData = {
-                sellerID: "A1V6B6X13IP5F8",
-                sellerName: "Name",
-                rating: 4.5,
-                ratingCount: 1000,
-
-                ratingCount1Stars: 30,
-                ratingCount2Stars: 30,
-                ratingCount3Stars: 30,
-                ratingCount4Stars: 30,
-                ratingCount5stars: 30,
-
-                lastUpdated: new Date()
-            };
-            
-            const sellerDatas = [
-                { sellerID: "A1V6B6X13IP5F8", rating: 4.5, ratingCount: 1000 },
-                { sellerID: "A1TQZUSOU22E9M", rating: 4.1, ratingCount: 2000 },
-                { sellerID: "A1JWSDDIH5Z7DV", rating: 4.3, ratingCount: 3000 },
-            ]
-            const sellerRatingObjectStore = db.transaction("SellerRating", "readwrite").objectStore("SellerRating");
-
-            sellerDatas.forEach((sellerData) => {
-                sellerRatingObjectStore.add(sellerData);
-            });
-            */
-        }    
-
-    }
-
-    request.onsuccess = (event) => {
-        const db = event.target.result;
-        console.log("Database opened successfully");
-        callbackOnSuccess(db);
-        
-    }
+    }    
 
 }
 
+request.onsuccess = (event) => {
+    db = event.target.result;
+    
+    listRequests.forEach(element => {
+        if(element.type === "cacheData") {
+            cacheData(element.data, element.callbackOnSuccess);
+        }
+        else if(element.type === "getData") {
+            getData(element.sellerID, element.callbackOnSuccess);
+        }
+        else if(element.type === "updateData") {
+            updateData(element.sellerID, element.callbackOnUpdate);
+        }
+        else {
+            console.error("Invalid request type>>" + element.type);
+        }
+    });
+    
+}
 
-function cacheData(db, data, callbackOnSuccess) {
+
+
+listRequests = []; //If db is null when cacheData(), getData() etc.. are called, these calls cached in here so that they can be executed when db in inited
+
+function cacheData(data, callbackOnSuccess) {
+    if(db===null) {
+        listRequests.push(
+            {
+                type: "cacheData",                
+                data: data,
+                callbackOnSuccess: callbackOnSuccess
+            });
+        return;
+    }
     const transaction = db.transaction(ObjectStoreName, "readwrite");
 
     transaction.oncomplete = (event) => {
@@ -90,8 +90,15 @@ function cacheData(db, data, callbackOnSuccess) {
 
 }
 
-function getData(db, sellerID, callbackOnSuccess) {
-    
+function getData(sellerID, callbackOnSuccess) {
+    if(db===null) {
+        listRequests.push({
+            type: "getData",
+            sellerID: sellerID,
+            callbackOnSuccess: callbackOnSuccess
+        });
+        return;
+    }
     const transaction = db.transaction(ObjectStoreName);
         
     const objectStore = transaction.objectStore(ObjectStoreName);
@@ -108,7 +115,16 @@ function getData(db, sellerID, callbackOnSuccess) {
     };
 }
 
-function updateData(db, sellerID, callbackOnUpate){
+function updateData(sellerID, callbackOnUpdate){
+    if(db===null) {
+        listRequests.push({
+            type: "updateData",
+            sellerID: sellerID,
+            callbackOnUpdate: callbackOnUpdate
+        });
+        return;
+    }
+
     const objectStore = db
         .transaction(ObjectStoreName, "readwrite")
         .objectStore(ObjectStoreName);
@@ -125,17 +141,8 @@ function updateData(db, sellerID, callbackOnUpate){
     
         // update the value(s) in the object that you want to change
         
-        callbackOnUpate(data);
-
-        /*data.sellerName = updatedData.sellerName;
-        data.rating = updatedData.rating;
-        data.ratingCount = updatedData.ratingCount;
-        data.ratingCount1Stars = updatedData.ratingCount1Stars;
-        data.ratingCount2Stars = updatedData.ratingCount2Stars;
-        data.ratingCount3Stars = updatedData.ratingCount3Stars;
-        data.ratingCount4Stars = updatedData.ratingCount4Stars;
-        data.ratingCount5stars = updatedData.ratingCount5stars;
-        data.lastUpdated = updatedData.lastUpdated;*/
+        callbackOnUpdate(data);  
+        console.log("updated data>>" + data.ratingCount);
     
         // Put this updated object back into the database.
         const requestUpdate = objectStore.put(data);

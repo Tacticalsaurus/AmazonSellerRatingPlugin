@@ -1,7 +1,7 @@
 document.body.style.border = "5px solid red" 
 
 let tempData = {
-    sellerID: "A1V6B6X13IP732",
+    sellerID: "A1V6B6X13IP7" + Math.floor(10 + Math.random() * 90),
     sellerName: "Amazon.com Services LLC",
     rating: 4.5,
     ratingCount: 1000,    
@@ -12,30 +12,20 @@ let tempData = {
     ratingCount5stars: 30,
     lastUpdated: new Date()
 }
-//tempData = { sellerID: "A1V6B6X13IP445", rating: 4.5, ratingCount: 1000 };
 
-let database = null;
-let db = null;
-initDatabase((db)=> {
-    database = db;
+updateData("A1V6B6X13IP732", (data)=>{
+    data.ratingCount = 2222;
 });
 
-setTimeout(() => {
-    /*cacheData(database, tempData, (event) => {
-        console.log("data cached");
-        
-    });*/
+cacheData(tempData, (event)=>{
+    console.log("data caching succesfull>>" + tempData.sellerID);
+})
 
-    /*getData(database, "A1V6B6X13IP732", (event, data) => {
-        console.log(data.sellerName);
-        data.ratingCount = 2222;
-        
-    });*/
-
+/*setTimeout(() => {    
     updateData(database, "A1V6B6X13IP732", (data)=>{
         data.ratingCount = 2222;
     });
-}, 3000);
+}, 3000);*/
 
 
 
