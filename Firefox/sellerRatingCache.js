@@ -33,6 +33,8 @@ request.onupgradeneeded = (event) => {
 
 }
 
+
+callbackOnDBInited = null;
 request.onsuccess = (event) => {
     db = event.target.result;
     
@@ -46,16 +48,49 @@ request.onsuccess = (event) => {
         else if(element.type === "updateData") {
             updateData(element.sellerID, element.callbackOnUpdate);
         }
+        else if(element.type === "getIDCount") {
+            getIDCount(element.sellerID, element.callbackOnUpdate);
+        }
         else {
             console.error("Invalid request type>>" + element.type);
         }
     });
+
+    //clearData();
+
+    if(callbackOnDBInited !==null) {
+        callbackOnDBInited();
+    }
     
 }
 
 
+function clearData() {
+    // open a read/write db transaction, ready for clearing the data
+    const transaction = db.transaction(ObjectStoreName, "readwrite");
+  
+    // report on the success of the transaction completing, when everything is done
+    transaction.oncomplete = (event) => {
+      
+    };
+  
+    transaction.onerror = (event) => {
 
-listRequests = []; //If db is null when cacheData(), getData() etc.. are called, these calls cached in here so that they can be executed when db in inited
+    };
+  
+    // create an object store on the transaction
+    const objectStore = transaction.objectStore(ObjectStoreName);
+  
+    // Make a request to clear all the data out of the object store
+    const objectStoreRequest = objectStore.clear();
+  
+    objectStoreRequest.onsuccess = (event) => {
+      console.log("objects cleared");
+    };
+}
+
+
+listRequests = []; //If db is null when cacheData(), getData() etc.. are called, these calls are cached in here so that they can be executed when db in inited
 
 function cacheData(data, callbackOnSuccess) {
     if(db===null) {
@@ -113,6 +148,29 @@ function getData(sellerID, callbackOnSuccess) {
         callbackOnSuccess(event, event.target.result);
         
     };
+}
+
+function getIDCount(sellerID, callbackOnSuccess){
+
+    if(db===null) {
+        listRequests.push({
+            type: "getIDCount",
+            sellerID: sellerID,
+            callbackOnSuccess: callbackOnSuccess
+        });
+    }
+
+    const transaction = db.transaction(ObjectStoreName, "readonly");
+    const objectStore = transaction.objectStore(ObjectStoreName);
+
+    const countRequest = objectStore.count(sellerID);
+
+   
+    countRequest.onsuccess = () => {
+        callbackOnSuccess(countRequest.result);
+        //console.log(countRequest.result);
+    };
+
 }
 
 function updateData(sellerID, callbackOnUpdate){
