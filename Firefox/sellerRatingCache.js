@@ -49,7 +49,7 @@ request.onsuccess = (event) => {
             updateData(element.sellerID, element.callbackOnUpdate);
         }
         else if(element.type === "getIDCount") {
-            getIDCount(element.sellerID, element.callbackOnUpdate);
+            getIDCount(element.sellerID, element.callbackOnSuccess);
         }
         else {
             console.error("Invalid request type>>" + element.type);
@@ -145,7 +145,7 @@ function getData(sellerID, callbackOnSuccess) {
     }
 
     request.onsuccess = (event) => {
-        callbackOnSuccess(event, event.target.result);
+        callbackOnSuccess(event.target.result);
         
     };
 }
@@ -158,6 +158,7 @@ function getIDCount(sellerID, callbackOnSuccess){
             sellerID: sellerID,
             callbackOnSuccess: callbackOnSuccess
         });
+        return;
     }
 
     const transaction = db.transaction(ObjectStoreName, "readonly");
