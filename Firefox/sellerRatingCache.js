@@ -56,7 +56,7 @@ request.onsuccess = (event) => {
         }
     });
 
-    //clearData();
+    //clearAllData();
 
     if(callbackOnDBInited !==null) {
         callbackOnDBInited();
@@ -65,7 +65,7 @@ request.onsuccess = (event) => {
 }
 
 
-function clearData() {
+function clearAllData() {
     // open a read/write db transaction, ready for clearing the data
     const transaction = db.transaction(ObjectStoreName, "readwrite");
   
@@ -75,7 +75,7 @@ function clearData() {
     };
   
     transaction.onerror = (event) => {
-
+        console.log("failed to delete all data>>" + event.target.result);
     };
   
     // create an object store on the transaction

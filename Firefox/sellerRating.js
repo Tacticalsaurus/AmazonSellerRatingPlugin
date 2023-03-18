@@ -14,7 +14,7 @@ document.body.style.border = "5px solid red"
     lastUpdated: new Date()
 }
 */
-
+console.log("sellerRating plugin running");
 let sellerInfos = document.querySelectorAll("[id='freshShipsFromSoldBy_feature_div']"); //pages on fresh items have this id. But only one of the divs with this id points to the merchant page
 let sellerInfo = null;
 
@@ -32,8 +32,13 @@ for(info of sellerInfos){
 }*/
  
 if(sellerInfo === null) {
-    sellerInfo = document.getElementById("merchant-info")
+    sellerInfo = document.getElementById("merchant-info");
+
+    if(sellerInfo === null) {
+        sellerInfo = document.getElementById("sellerProfileTriggerId");
+    }
 }
+
 
 if(sellerInfo != null) {
 
@@ -42,12 +47,17 @@ if(sellerInfo != null) {
 
     let merchantLinkRelative = null
 
+    if(anchors === null || anchors.length <= 0) {
+        if(sellerInfo.tagName.toLowerCase() == "a") {
+            anchors = [sellerInfo];
+        }
+    }
     if(anchors!==null && anchors.length > 0) {
         for(element of anchors) {
             let href = element.attributes["href"]
             if(href!=null) {
                 value = href.value
-                if(value.includes("marketplaceID=")) {
+                if(value.includes("marketplaceID=") || value.includes("dp_merchant_link")) {
                     merchantLinkRelative = value
                     break;
                 }
@@ -85,15 +95,65 @@ if(sellerInfo != null) {
         let hostName0 = locationSplit[0]
         let hostName1 = locationSplit[1].split("/")[0]
 
-        let sellerID = merchantLinkRelative.split(/.*[seller=]/)[1];
+        console.log("mer link>>" + merchantLinkRelative);
+        let sellerID = merchantLinkRelative.split("seller=")[1];
+        sellerID = sellerID.split("&")[0];
 
+        
         getIDCount(sellerID, (count) => {
             if(count > 0) {
                 getData(sellerID, (data)=>{
-                    injectSellerRating(data);
+                    let today = new Date();
+                    let milliSecondsSinceDataStored = today.getTime() - data.lastUpdated.getTime();
+                    let daysSinceDataStored = milliSecondsSinceDataStored / (24 * 60 * 60 * 1000);
+
+                    let bUseCachedData = false;
+                    if(data.countRatings <= 10) {
+                        loadSellerPage(true)
+                    }
+                    else if(data.countRatings <= 50) {
+                        if(daysSinceDataStored > 5) {
+                            loadSellerPage(true);
+                        }
+                        else{
+                            bUseCachedData = true;
+                        }
+                    }
+                    else if(data.countRatings <= 100) {
+                        if(daysSinceDataStored > 15) {
+                            loadSellerPage(true);
+                        }
+                        else{
+                            bUseCachedData = true;
+                        }
+                    }
+                    else if(data.countRatings <= 500) {
+                        if(daysSinceDataStored > 30) {
+                            loadSellerPage(true);
+                        }
+                        else{
+                            bUseCachedData = true;
+                        }
+                    }
+                    else {
+                        if(daysSinceDataStored > 60) {
+                            loadSellerPage(true);
+                        }
+                        else{
+                            bUseCachedData = true;
+                        }
+                    }
+                    //data.lastUpdated
+                    if(bUseCachedData) {
+                        injectSellerRating(data);
+                    }
                 });
             }
-            else {
+            else { //no cached data found
+                loadSellerPage(false);
+            }
+
+            function loadSellerPage(bUpdateData) { //set bUpdateData to true to update the currently stored data because the data is too old
 
                 let hostName = hostName0 + "//"+ hostName1;
                 const merchantLinkFull = hostName + merchantLinkRelative
@@ -142,13 +202,30 @@ if(sellerInfo != null) {
 
 
                         cachedData = sellerData;
-                        cacheData(sellerData, (event)=>{
-                            console.log("data cached succesfully");
-                        });
-                    }
+                        if(bUpdateData) {
+                            updateData(sellerData.sellerID, (data) => {
+                                data.sellerID = sellerData.sellerID; //sellerID is unlikely to change. But update it anyway just in case
+                                data.sellerName = sellerData.sellerName //sellerName is unlikely to change. But update it anyway just in case
+                                data.sellerLink = sellerData.sellerLink //sellerLink is unlikely to change. But update it anyway just in case
+                                data.starRating = sellerData.starRating;
+                                data.countRatings = sellerData.countRatings;
+                                data.percentage1Star = sellerData.percentage1Star;
+                                data.percentage2Star = sellerData.percentage2Star;
+                                data.percentage3Star = sellerData.percentage3Star;
+                                data.percentage4Star = sellerData.percentage4Star;
+                                data.percentage5Star = sellerData.percentage5Star;
+                                data.lastUpdated = sellerData.lastUpdated;
 
-                    injectSellerRating(sellerData);
-                        
+                            });
+                        }
+                        else {
+                            cacheData(sellerData, (event)=>{
+                                console.log("data cached succesfully");
+                            });
+                        }
+
+                        injectSellerRating(sellerData);
+                    }
                 }
                 
                 xhr.onerror = function(e) {
@@ -235,8 +312,6 @@ if(sellerInfo != null) {
                 .replace("_placeHolderRatingCount_", countRatingsFormatted)
                 .replace("_placeHolderSellerLink_", sellerLink)
                 .replace("_placeHolderSellerName_", sellerName);
-                
-                
 
                 createRatingPopupHTML(cachedData, starHtmlFull, sellerName, sellerLink, countRatings, starRating)
                 .then(html2 => { 
